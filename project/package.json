@@ -1,8 +1,8 @@
 {
   "private": true,
-  "name": "my-app",
-  "version": "1.0.0",
-  "description": "npm init template for bootstrapping an empty Colyseus project",
+  "name": "tbrpg-realtime-arena-server",
+  "version": "0.0.1",
+  "description": "Realtime arena server-side for https://github.com/insthync/unity-tbrpg-realtime-arena",
   "main": "lib/index.js",
   "scripts": {
     "start": "ts-node-dev --respawn --transpile-only src/index.ts",
@@ -11,12 +11,12 @@
     "clean": "node node_modules/rimraf/bin lib",
     "test": "mocha --require ts-node/register test/**_test.ts --exit --timeout 15000"
   },
-  "author": "",
-  "license": "UNLICENSED",
+  "author": "Ittipon Teerapruettikulchai",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/colyseus/create-colyseus/issues"
+    "url": "https://github.com/insthync/unity-tbrpg-realtime-arena/issues"
   },
-  "homepage": "https://github.com/colyseus/create-colyseus#readme",
+  "homepage": "https://github.com/insthync/unity-tbrpg-realtime-arena",
   "devDependencies": {
     "@colyseus/loadtest": "^0.14.4",
     "@colyseus/testing": "^0.14.21",
