@@ -1,2 +1,2 @@
-# https-github.com-insthync-tbrpg-realtime-arena-server
+# tbrpg-realtime-arena-server
 Realtime arena server-side for https://github.com/insthync/unity-tbrpg-realtime-arena
