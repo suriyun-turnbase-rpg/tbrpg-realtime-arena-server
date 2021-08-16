@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@colyseus/arena": "^0.14.22",
+    "@colyseus/command": "^0.1.7",
     "@colyseus/monitor": "^0.14.20",
     "colyseus": "^0.14.20",
     "cors": "^2.8.5",
