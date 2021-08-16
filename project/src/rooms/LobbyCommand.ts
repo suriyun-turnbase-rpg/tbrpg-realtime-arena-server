@@ -20,19 +20,21 @@ export class OnToggleReadyCommand extends Command<LobbyRoomState, {
         player.isReady = !player.isReady;
         this.state.players.set(client.sessionId, player);
         // Check if all players ready all not
-        let playersReady = true;
-        this.state.players.forEach((value: LobbyPlayer, key: string, map: Map<string, LobbyPlayer>) => {
-            if (!value.isReady) {
-                playersReady = false;
+        if (this.state.players.size >= 2) {
+            let playersReady = true;
+            this.state.players.forEach((value: LobbyPlayer, key: string, map: Map<string, LobbyPlayer>) => {
+                if (!value.isReady) {
+                    playersReady = false;
+                }
+            });
+            // Players are ready?, count down to start game
+            if (playersReady) {
+                if (!this.state.isStarting)
+                    this.state.isStarting = true;
+            } else {
+                if (this.state.isStarting)
+                    this.state.isStarting = false;
             }
-        });
-        // Players are ready?, count down to start game
-        if (playersReady) {
-            if (!this.state.isStarting)
-                this.state.isStarting = true;
-        } else {
-            if (this.state.isStarting)
-                this.state.isStarting = false;
         }
     }
 }
