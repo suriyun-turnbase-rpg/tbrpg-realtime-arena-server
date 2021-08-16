@@ -7,14 +7,16 @@ export class LobbyRoom extends Room<LobbyRoomState> {
   password: string = "";
 
   onCreate (options: any) {
+    // It's 1 vs 1 battle game, so it can have only 2 clients
+    const hasPassword: boolean = options.password && options.password.length > 0;
     this.maxClients = 2;
     this.password = options.password;
     this.setState(new LobbyRoomState());
     this.setMetadata({
       title: options.title,
-      hasPassword: options.password && options.password.length > 0
+      hasPassword: hasPassword,
     });
-    console.log("room " + options.title + " created with password " + options.password);
+    console.log("room " + options.title + " created, has password? " + hasPassword);
   }
 
   onJoin (client: Client, options: any) {
