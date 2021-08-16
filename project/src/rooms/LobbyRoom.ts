@@ -1,6 +1,7 @@
 import { Room, Client } from "colyseus";
 import { Dispatcher } from "@colyseus/command";
 import { LobbyRoomState } from "./schema/LobbyRoomState";
+import * as Commands from "./LobbyCommand";
 
 export class LobbyRoom extends Room<LobbyRoomState> {
   dispatcher = new Dispatcher(this);
@@ -16,6 +17,11 @@ export class LobbyRoom extends Room<LobbyRoomState> {
       title: options.title,
       hasPassword: hasPassword,
     });
+    this.onMessage("ready", (client) => {
+      this.dispatcher.dispatch(new Commands.OnToggleReadyCommand(), {
+        client: client,
+      });
+    });
     console.log("room " + options.title + " created, has password? " + hasPassword);
   }
 
@@ -26,6 +32,9 @@ export class LobbyRoom extends Room<LobbyRoomState> {
       console.log(client.sessionId, "rejected! (wrong password)");
       throw new Error("rejected! (wrong password)");
     }
+    this.dispatcher.dispatch(new Commands.OnJoinCommand(), {
+      sessionId: client.sessionId,
+    });
     console.log(client.sessionId, "joined!");
   }
 
