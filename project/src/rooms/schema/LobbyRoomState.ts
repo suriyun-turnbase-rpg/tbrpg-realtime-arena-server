@@ -4,4 +4,7 @@ import { LobbyPlayer } from "./LobbyPlayer"
 export class LobbyRoomState extends Schema {
   @type({ map: LobbyPlayer }) 
   players = new MapSchema<LobbyPlayer>();
+
+  @type("boolean")
+  isStarting: boolean = false;
 }
