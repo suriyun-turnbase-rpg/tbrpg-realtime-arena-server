@@ -25,6 +25,11 @@ export class GameRoom extends Room<GameRoomState> {
         client: client,
       });
     });
+    this.onMessage("enterGame", (client) => {
+      this.dispatcher.dispatch(new Commands.OnEnterGameCommand(), {
+        client: client,
+      });
+    });
     console.log("room " + options.title + " created, has password? " + hasPassword);
     this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }
@@ -64,26 +69,24 @@ export class GameRoom extends Room<GameRoomState> {
         }
         break;
       case ERoomState.Battle:
+        this.updateBattle(deltaTime);
         break;
     }
   }
 
   onStateChange(state: number) {
-    switch (this.state.state) {
+    switch (state) {
       case ERoomState.CountDownToStartGame:
         // Five seconds to start game
         this.currentRoomCountDown = 5;
         break;
       case ERoomState.Battle:
+        // Game started, find player to start first turn
         break;
     }
   }
 
-  updateCountDown (deltaTime: number) {
-
-  }
-
-  updateBattle (deltaTime: number) {
+  updateBattle(deltaTime: number) {
 
   }
 }
