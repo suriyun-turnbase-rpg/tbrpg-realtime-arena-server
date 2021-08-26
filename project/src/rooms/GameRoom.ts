@@ -48,6 +48,8 @@ export class GameRoom extends Room<GameRoomState> {
   }
 
   onLeave (client: Client, consented: boolean) {
+    this.state.players.delete(client.sessionId);
+    this.broadcast("playerLeave", client.sessionId);
     console.log(client.sessionId, "left!");
   }
 
