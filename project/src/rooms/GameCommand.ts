@@ -1,17 +1,17 @@
 import { Client } from "colyseus";
 import { Command } from "@colyseus/command";
-import { LobbyPlayer } from "./schema/LobbyPlayer";
-import { LobbyRoomState } from "./schema/LobbyRoomState";
+import { GamePlayer } from "./schema/GamePlayer";
+import { GameRoomState } from "./schema/GameRoomState";
 
-export class OnJoinCommand extends Command<LobbyRoomState, {
+export class OnJoinCommand extends Command<GameRoomState, {
     sessionId: string
 }> {
     execute({ sessionId } = this.payload) {
-        this.state.players.set(sessionId, new LobbyPlayer());
+        this.state.players.set(sessionId, new GamePlayer());
     }
 }
 
-export class OnToggleReadyCommand extends Command<LobbyRoomState, {
+export class OnToggleReadyCommand extends Command<GameRoomState, {
     client: Client
 }> {
     execute({ client } = this.payload) {
@@ -22,7 +22,7 @@ export class OnToggleReadyCommand extends Command<LobbyRoomState, {
         // Check if all players ready all not
         if (this.state.players.size >= 2) {
             let playersReady = true;
-            this.state.players.forEach((value: LobbyPlayer, key: string, map: Map<string, LobbyPlayer>) => {
+            this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
                 if (!value.isReady) {
                     playersReady = false;
                 }

@@ -1,6 +1,6 @@
 import { Schema, type } from "@colyseus/schema";
 
-export class LobbyPlayer extends Schema {
+export class GamePlayer extends Schema {
   @type("string")
   playerName: string = "Player Name";
 

@@ -1,9 +1,9 @@
 import { Room, Client } from "colyseus";
 import { Dispatcher } from "@colyseus/command";
-import { LobbyRoomState } from "./schema/LobbyRoomState";
-import * as Commands from "./LobbyCommand";
+import { GameRoomState } from "./schema/GameRoomState";
+import * as Commands from "./GameCommand";
 
-export class LobbyRoom extends Room<LobbyRoomState> {
+export class GameRoom extends Room<GameRoomState> {
   dispatcher = new Dispatcher(this);
   password: string = "";
 
@@ -12,7 +12,7 @@ export class LobbyRoom extends Room<LobbyRoomState> {
     const hasPassword: boolean = options.password && options.password.length > 0;
     this.maxClients = 2;
     this.password = options.password;
-    this.setState(new LobbyRoomState());
+    this.setState(new GameRoomState());
     this.setMetadata({
       title: options.title,
       hasPassword: hasPassword,
