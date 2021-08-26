@@ -29,7 +29,7 @@ export class OnToggleReadyCommand extends Command<GameRoomState, {
         if (this.state.players.size >= 2) {
             let playersReady = true;
             this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
-                if (player.state < EPlayerState.Ready) {
+                if (value.state < EPlayerState.Ready) {
                     playersReady = false;
                 }
             });
