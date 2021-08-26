@@ -1,4 +1,5 @@
 import { Schema, type } from "@colyseus/schema";
+import { EPlayerState } from "../enums/EPlayerState";
 
 export class GamePlayer extends Schema {
   @type("string")
@@ -16,6 +17,6 @@ export class GamePlayer extends Schema {
   @type("int32")
   leaderCharacterLevel: number = 1;
 
-  @type("boolean")
-  isReady: boolean = false;
+  @type("uint8")
+  state: number = EPlayerState.None;
 }

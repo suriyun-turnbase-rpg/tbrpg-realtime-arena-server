@@ -1,5 +1,7 @@
 import { Client } from "colyseus";
 import { Command } from "@colyseus/command";
+import { EPlayerState } from "./enums/EPlayerState";
+import { ERoomState } from "./enums/ERoomState";
 import { GamePlayer } from "./schema/GamePlayer";
 import { GameRoomState } from "./schema/GameRoomState";
 
@@ -17,23 +19,27 @@ export class OnToggleReadyCommand extends Command<GameRoomState, {
     execute({ client } = this.payload) {
         // Change player ready state
         const player = this.state.players.get(client.sessionId);
-        player.isReady = !player.isReady;
+        if (player.state < EPlayerState.Ready) {
+            player.state = EPlayerState.Ready;
+        } else {
+            player.state = EPlayerState.None;
+        }
         this.state.players.set(client.sessionId, player);
         // Check if all players ready all not
         if (this.state.players.size >= 2) {
             let playersReady = true;
             this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
-                if (!value.isReady) {
+                if (player.state < EPlayerState.Ready) {
                     playersReady = false;
                 }
             });
             // Players are ready?, count down to start game
             if (playersReady) {
-                if (!this.state.isStarting)
-                    this.state.isStarting = true;
+                if (this.state.state < ERoomState.CountDownToStartGame)
+                    this.state.state = ERoomState.CountDownToStartGame;
             } else {
-                if (this.state.isStarting)
-                    this.state.isStarting = false;
+                if (this.state.state < ERoomState.WaitPlayersToEnterGame)
+                    this.state.state = ERoomState.WaitPlayersToReady;
             }
         }
     }
