@@ -17,6 +17,10 @@ export class OnToggleReadyCommand extends Command<GameRoomState, {
     client: Client
 }> {
     execute({ client } = this.payload) {
+        // Not allow to toggle ready state if game state >= wait players to enter game
+        if (this.state.state >= ERoomState.WaitPlayersToEnterGame) {
+            return;
+        }
         // Change player ready state
         const player = this.state.players.get(client.sessionId);
         if (player.state < EPlayerState.Ready) {
@@ -35,11 +39,9 @@ export class OnToggleReadyCommand extends Command<GameRoomState, {
             });
             // Players are ready?, count down to start game
             if (playersReady) {
-                if (this.state.state < ERoomState.CountDownToStartGame)
-                    this.state.state = ERoomState.CountDownToStartGame;
+                this.state.state = ERoomState.CountDownToStartGame;
             } else {
-                if (this.state.state < ERoomState.WaitPlayersToEnterGame)
-                    this.state.state = ERoomState.WaitPlayersToReady;
+                this.state.state = ERoomState.WaitPlayersToReady;
             }
         }
     }
