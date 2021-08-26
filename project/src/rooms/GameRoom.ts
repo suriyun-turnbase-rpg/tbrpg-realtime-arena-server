@@ -1,11 +1,14 @@
 import { Room, Client } from "colyseus";
 import { Dispatcher } from "@colyseus/command";
+import { ERoomState } from "./enums/ERoomState";
 import { GameRoomState } from "./schema/GameRoomState";
 import * as Commands from "./GameCommand";
 
 export class GameRoom extends Room<GameRoomState> {
   dispatcher = new Dispatcher(this);
   password: string = "";
+  currentRoomState: number = ERoomState.WaitPlayersToReady;
+  currentRoomCountDown: number = 0;
 
   onCreate (options: any) {
     // It's 1 vs 1 battle game, so it can have only 2 clients
@@ -23,6 +26,7 @@ export class GameRoom extends Room<GameRoomState> {
       });
     });
     console.log("room " + options.title + " created, has password? " + hasPassword);
+    this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }
 
   onJoin (client: Client, options: any) {
@@ -45,5 +49,41 @@ export class GameRoom extends Room<GameRoomState> {
   onDispose() {
     console.log("room", this.roomId, "disposing...");
     this.dispatcher.stop();
+  }
+
+  update (deltaTime: number) {
+    if (this.currentRoomState != this.state.state) {
+      this.currentRoomState = this.state.state;
+      this.onStateChange(this.state.state);
+    }
+    switch (this.state.state) {
+      case ERoomState.CountDownToStartGame:
+        this.currentRoomCountDown -= deltaTime;
+        if (this.currentRoomCountDown <= 0) {
+          this.state.state = ERoomState.WaitPlayersToEnterGame;
+        }
+        break;
+      case ERoomState.Battle:
+        break;
+    }
+  }
+
+  onStateChange(state: number) {
+    switch (this.state.state) {
+      case ERoomState.CountDownToStartGame:
+        // Five seconds to start game
+        this.currentRoomCountDown = 5;
+        break;
+      case ERoomState.Battle:
+        break;
+    }
+  }
+
+  updateCountDown (deltaTime: number) {
+
+  }
+
+  updateBattle (deltaTime: number) {
+
   }
 }
