@@ -56,7 +56,7 @@ export class GameRoom extends Room<GameRoomState> {
     this.dispatcher.stop();
   }
 
-  update (deltaTime: number) {
+  update(deltaTime: number) {
     if (this.currentRoomState != this.state.state) {
       this.currentRoomState = this.state.state;
       this.onStateChange(this.state.state);
@@ -78,7 +78,7 @@ export class GameRoom extends Room<GameRoomState> {
     switch (state) {
       case ERoomState.CountDownToStartGame:
         // Five seconds to start game
-        this.currentRoomCountDown = 5;
+        this.currentRoomCountDown = 5000;
         break;
       case ERoomState.Battle:
         // Game started, find player to start first turn
