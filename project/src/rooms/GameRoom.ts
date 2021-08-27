@@ -10,6 +10,7 @@ export class GameRoom extends Room<GameRoomState> {
   password: string = "";
   currentRoomState: number = ERoomState.WaitPlayersToReady;
   currentRoomCountDown: number = 0;
+  playerLoginTokens: { [string]: string } = {};
 
   onCreate (options: any) {
     // It's 1 vs 1 battle game, so it can have only 2 clients
@@ -38,6 +39,7 @@ export class GameRoom extends Room<GameRoomState> {
   onJoin (client: Client, options: any) {
     const password = this.password;
     const dispatcher = this.dispatcher;
+    const playerLoginTokens = this.playerLoginTokens;
     const serviceUrl = process.env.SERVICE_URL;
     axios.post(serviceUrl + "/validate-login-token?loginToken=" + options.loginToken, {
         refreshToken: false,
@@ -55,6 +57,9 @@ export class GameRoom extends Room<GameRoomState> {
           console.log(client.sessionId, "rejected! (" + response.data.error + ")");
           throw new Error("rejected! (" + response.data.error + ")");
         }
+        // Store player login token, it will being used for web-service validation
+        playerLoginTokens[client.sessionId] = options.loginToken;
+        // Store player to the room state
         dispatcher.dispatch(new Commands.OnJoinCommand(), {
           sessionId: client.sessionId,
           player: response.data.player,
@@ -64,9 +69,7 @@ export class GameRoom extends Room<GameRoomState> {
       .catch(function (error) {
         // handle error
         console.log("Cannot validate login token: " + error);
-      })
-      .then(function () {
-
+        throw new Error("rejected! (" + error + ")");
       });
   }
 
