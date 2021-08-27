@@ -33,13 +33,12 @@ export class GameRoom extends Room<GameRoomState> {
       });
     });
     this.onMessage("updateActiveCharacter", (client, id) => {
-      if (client.sessionId != this.state.managerSessionId) {
-        // Only manager is allowed to do this
-        return;
-      }
+      if (this.state.state != ERoomState.Battle) return;
+      if (client.sessionId != this.state.managerSessionId) return;
       this.broadcast("updateActiveCharacter", id);
     });
     this.onMessage("doSelectedAction", (client, data) => {
+      if (this.state.state != ERoomState.Battle) return;
       this.broadcast("doSelectedAction", data);
     });
     console.log("room " + options.title + " created, has password? " + hasPassword);
@@ -106,9 +105,6 @@ export class GameRoom extends Room<GameRoomState> {
           this.state.state = ERoomState.WaitPlayersToEnterGame;
         }
         break;
-      case ERoomState.Battle:
-        this.updateBattle(deltaTime);
-        break;
     }
   }
 
@@ -118,13 +114,6 @@ export class GameRoom extends Room<GameRoomState> {
         // Five seconds to start game
         this.currentRoomCountDown = 5000;
         break;
-      case ERoomState.Battle:
-        // Game started, find player to start first turn
-        break;
     }
-  }
-
-  updateBattle(deltaTime: number) {
-
   }
 }
