@@ -10,6 +10,12 @@ export class OnJoinCommand extends Command<GameRoomState, {
 }> {
     execute({ sessionId } = this.payload) {
         this.state.players.set(sessionId, new GamePlayer());
+        let team: number = 0;
+        this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
+            // Simple assign player's team, 0 = A, 1 = B
+            value.team = team++;
+            this.state.players.set(key, value);
+        });
     }
 }
 
