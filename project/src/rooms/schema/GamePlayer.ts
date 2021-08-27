@@ -3,19 +3,22 @@ import { EPlayerState } from "../enums/EPlayerState";
 
 export class GamePlayer extends Schema {
   @type("string")
-  playerName: string = "Player Name";
+  id: string = "";
+
+  @type("string")
+  profileName: string = "Player Name";
 
   @type("int32")
-  playerLevel: number = 1;
+  exp: number = 1;
 
   @type("int32")
   teamBP: number = 0;
 
   @type("string")
-  leaderCharacterId: string = "";
+  mainCharacter: string = "";
 
   @type("int32")
-  leaderCharacterLevel: number = 1;
+  mainCharacterExp: number = 1;
 
   @type("uint8")
   team: number = 0;

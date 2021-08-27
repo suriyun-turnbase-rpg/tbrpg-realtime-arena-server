@@ -3,6 +3,7 @@ import { Dispatcher } from "@colyseus/command";
 import { ERoomState } from "./enums/ERoomState";
 import { GameRoomState } from "./schema/GameRoomState";
 import * as Commands from "./GameCommand";
+import * as axios from "axios";
 
 export class GameRoom extends Room<GameRoomState> {
   dispatcher = new Dispatcher(this);
@@ -35,16 +36,38 @@ export class GameRoom extends Room<GameRoomState> {
   }
 
   onJoin (client: Client, options: any) {
-    // TODO: validate access token
-    if (this.password != options.password) {
-      // reject because password is wrong
-      console.log(client.sessionId, "rejected! (wrong password)");
-      throw new Error("rejected! (wrong password)");
-    }
-    this.dispatcher.dispatch(new Commands.OnJoinCommand(), {
-      sessionId: client.sessionId,
-    });
-    console.log(client.sessionId, "joined!");
+    const password = this.password;
+    const dispatcher = this.dispatcher;
+    const serviceUrl = process.env.SERVICE_URL;
+    axios.post(serviceUrl + "/validate-login-token?loginToken=" + options.loginToken, {
+        refreshToken: false,
+      }, {
+        headers: {'Authorization': "Bearer " + options.loginToken}
+      })
+      .then(function (response) {
+        if (password != options.password) {
+          // reject because password is wrong
+          console.log(client.sessionId, "rejected! (wrong password)");
+          throw new Error("rejected! (wrong password)");
+        }
+        if (response.data.error) {
+          // reject because error occuring
+          console.log(client.sessionId, "rejected! (" + response.data.error + ")");
+          throw new Error("rejected! (" + response.data.error + ")");
+        }
+        dispatcher.dispatch(new Commands.OnJoinCommand(), {
+          sessionId: client.sessionId,
+          player: response.data.player,
+        });
+        console.log(client.sessionId, "joined!");
+      })
+      .catch(function (error) {
+        // handle error
+        console.log("Cannot validate login token: " + error);
+      })
+      .then(function () {
+
+      });
   }
 
   onLeave (client: Client, consented: boolean) {

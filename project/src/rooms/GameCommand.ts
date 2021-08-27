@@ -8,8 +8,15 @@ import { GameRoomState } from "./schema/GameRoomState";
 export class OnJoinCommand extends Command<GameRoomState, {
     sessionId: string
 }> {
-    execute({ sessionId } = this.payload) {
-        this.state.players.set(sessionId, new GamePlayer());
+    execute({ sessionId, player } = this.payload) {
+        const newPlayer = new GamePlayer();
+        newPlayer.id = String(player.id),
+        newPlayer.profileName = player.profileName,
+        newPlayer.exp = player.exp,
+        newPlayer.mainCharacter = player.mainCharacter,
+        newPlayer.mainCharacterExp = player.mainCharacterExp,
+        // Set new player data
+        this.state.players.set(sessionId, newPlayer);
         let team: number = 0;
         this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
             // Simple assign player's team, 0 = A, 1 = B
