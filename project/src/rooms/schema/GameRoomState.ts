@@ -6,6 +6,9 @@ export class GameRoomState extends Schema {
   @type({ map: GamePlayer }) 
   players = new MapSchema<GamePlayer>();
 
+  @type("string")
+  managerSessionId: string = "";
+
   @type("uint8")
   state: number = ERoomState.WaitPlayersToReady;
 }

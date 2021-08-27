@@ -76,14 +76,18 @@ export class OnEnterGameCommand extends Command<GameRoomState, {
         this.state.players.set(client.sessionId, player);
         // Check if all players are in game
         if (this.state.players.size >= 2) {
+            // Session manager can be switched later.
+            let managerSessionId = client.sessionId;
             let playersInGame = true;
             this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
                 if (value.state < EPlayerState.InGame) {
+                    managerSessionId = "";
                     playersInGame = false;
                 }
             });
             // Players are in game?, game started
             if (playersInGame) {
+                this.state.managerSessionId = managerSessionId;
                 this.state.state = ERoomState.Battle;
             }
         }
