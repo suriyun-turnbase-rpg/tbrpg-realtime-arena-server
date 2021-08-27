@@ -32,6 +32,16 @@ export class GameRoom extends Room<GameRoomState> {
         client: client,
       });
     });
+    this.onMessage("updateActiveCharacter", (client, id) => {
+      if (client.sessionId != this.state.managerSessionId) {
+        // Only manager is allowed to do this
+        return;
+      }
+      this.broadcast("updateActiveCharacter", id);
+    });
+    this.onMessage("doSelectedAction", (client, data) => {
+      this.broadcast("doSelectedAction", data);
+    });
     console.log("room " + options.title + " created, has password? " + hasPassword);
     this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }
