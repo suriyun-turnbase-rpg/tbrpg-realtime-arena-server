@@ -6,7 +6,8 @@ import { GamePlayer } from "./schema/GamePlayer";
 import { GameRoomState } from "./schema/GameRoomState";
 
 export class OnJoinCommand extends Command<GameRoomState, {
-    sessionId: string
+    sessionId: string,
+    player: any,
 }> {
     execute({ sessionId, player } = this.payload) {
         const newPlayer = new GamePlayer();
