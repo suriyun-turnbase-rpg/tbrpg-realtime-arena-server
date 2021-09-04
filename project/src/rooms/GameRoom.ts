@@ -14,7 +14,7 @@ export class GameRoom extends Room<GameRoomState> {
 
   onCreate (options: any) {
     // It's 1 vs 1 battle game, so it can have only 2 clients
-    const hasPassword: boolean = options.password && options.password.length > 0;
+    const hasPassword: boolean = (options.password && options.password.length > 0) ? true : false;
     this.maxClients = 2;
     this.password = options.password;
     this.setState(new GameRoomState());
