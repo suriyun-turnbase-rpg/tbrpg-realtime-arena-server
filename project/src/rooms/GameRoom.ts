@@ -58,12 +58,12 @@ export class GameRoom extends Room<GameRoomState> {
       .then(function(response: any) {
         if (password != options.password) {
           // reject because password is wrong
-          console.log(client.sessionId, "rejected! (wrong password)");
+          console.log(client.sessionId + " rejected! (wrong password)");
           throw new Error("rejected! (wrong password)");
         }
         if (response.data.error) {
           // reject because error occuring
-          console.log(client.sessionId, "rejected! (" + response.data.error + ")");
+          console.log(client.sessionId + " rejected! (" + response.data.error + ")");
           throw new Error("rejected! (" + response.data.error + ")");
         }
         // Store player login token, it will being used for web-service validation
@@ -73,7 +73,7 @@ export class GameRoom extends Room<GameRoomState> {
           sessionId: client.sessionId,
           player: response.data.player,
         });
-        console.log(client.sessionId, "joined!");
+        console.log(client.sessionId + " joined!");
       })
       .catch(function(error: string) {
         // handle error
@@ -85,11 +85,11 @@ export class GameRoom extends Room<GameRoomState> {
   onLeave (client: Client, consented: boolean) {
     this.state.players.delete(client.sessionId);
     this.broadcast("playerLeave", client.sessionId);
-    console.log(client.sessionId, "left!");
+    console.log(client.sessionId + " left!");
   }
 
   onDispose() {
-    console.log("room", this.roomId, "disposing...");
+    console.log("room " + this.roomId + " disposing...");
     this.dispatcher.stop();
   }
 
