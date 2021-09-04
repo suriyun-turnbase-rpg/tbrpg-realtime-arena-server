@@ -10,12 +10,13 @@ export class OnJoinCommand extends Command<GameRoomState, {
     player: any,
 }> {
     execute({ sessionId, player } = this.payload) {
-        const newPlayer = new GamePlayer();
-        newPlayer.id = String(player.id),
-        newPlayer.profileName = player.profileName,
-        newPlayer.exp = player.exp,
-        newPlayer.mainCharacter = player.mainCharacter,
-        newPlayer.mainCharacterExp = player.mainCharacterExp,
+        const newPlayer = new GamePlayer().assign({
+            id: String(player.id),
+            profileName: player.profileName,
+            exp: player.exp,
+            mainCharacter: player.mainCharacter,
+            mainCharacterExp: player.mainCharacterExp,
+        });
         // Set new player data
         this.state.players.set(sessionId, newPlayer);
         let team: number = 0;
