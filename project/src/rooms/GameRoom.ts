@@ -1,6 +1,7 @@
 import { Room, Client } from "colyseus";
 import { Dispatcher } from "@colyseus/command";
 import { ERoomState } from "./enums/ERoomState";
+import { GamePlayer } from "./schema/GamePlayer";
 import { GameRoomState } from "./schema/GameRoomState";
 import * as Commands from "./GameCommand";
 import * as axios from "axios";
@@ -85,6 +86,12 @@ export class GameRoom extends Room<GameRoomState> {
   onLeave (client: Client, consented: boolean) {
     this.state.players.delete(client.sessionId);
     this.broadcast("playerLeave", client.sessionId);
+    if (client.sessionId == this.state.managerSessionId) {
+      // Change manager to another
+      this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
+          this.state.managerSessionId = key
+      });
+    }
     console.log(client.sessionId + " left!");
   }
 
