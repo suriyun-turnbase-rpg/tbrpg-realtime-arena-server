@@ -77,7 +77,7 @@ export class OnEnterGameCommand extends Command<GameRoomState, {
         }
         this.state.players.set(client.sessionId, player);
         // Check if all players are in game
-        if (this.state.players.size >= 2) {
+        if (this.state.players.size >= 2 && !this.state.managerSessionId) {
             // Session manager can be switched later.
             let managerSessionId = client.sessionId;
             let playersInGame = true;
