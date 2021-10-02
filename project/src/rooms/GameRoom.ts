@@ -13,6 +13,7 @@ export class GameRoom extends Room<GameRoomState> {
   currentRoomCountDown: number = 0;
   playerLoginTokens: { [key: string]: string } = {};
   gameplayState: any;
+  waitForPlayerAction: boolean = false;
 
   onCreate (options: any) {
     // It's 1 vs 1 battle game, so it can have only 2 clients
@@ -41,6 +42,7 @@ export class GameRoom extends Room<GameRoomState> {
     this.onMessage("updateActiveCharacter", (client, id) => {
       if (this.state.state != ERoomState.Battle) return;
       if (client.sessionId != this.state.managerSessionId) return;
+      this.waitForPlayerAction = true;
       this.broadcast("updateActiveCharacter", id);
     });
     this.onMessage("updateGameplayState", (client, data) => {
@@ -56,6 +58,8 @@ export class GameRoom extends Room<GameRoomState> {
     });
     this.onMessage("doSelectedAction", (client, data) => {
       if (this.state.state != ERoomState.Battle) return;
+      if (!this.waitForPlayerAction) return;
+      this.waitForPlayerAction = false;
       this.broadcast("doSelectedAction", data);
     });
     console.log("room " + options.title + " created, has password? " + hasPassword);
