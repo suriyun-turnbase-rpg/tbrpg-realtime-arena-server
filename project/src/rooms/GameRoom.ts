@@ -12,6 +12,7 @@ export class GameRoom extends Room<GameRoomState> {
   currentRoomState: number = ERoomState.WaitPlayersToReady;
   currentRoomCountDown: number = 0;
   playerLoginTokens: { [key: string]: string } = {};
+  gameplayState: any;
 
   onCreate (options: any) {
     // It's 1 vs 1 battle game, so it can have only 2 clients
@@ -29,6 +30,10 @@ export class GameRoom extends Room<GameRoomState> {
       });
     });
     this.onMessage("enterGame", (client) => {
+      if (this.state.state == ERoomState.Battle) {
+        // Battle already started, send characters to the client which is just entering the game
+        client.send("updateGameplayState", this.gameplayState);
+      }
       this.dispatcher.dispatch(new Commands.OnEnterGameCommand(), {
         client: client,
       });
@@ -37,6 +42,13 @@ export class GameRoom extends Room<GameRoomState> {
       if (this.state.state != ERoomState.Battle) return;
       if (client.sessionId != this.state.managerSessionId) return;
       this.broadcast("updateActiveCharacter", id);
+    });
+    this.onMessage("updateGameplayState", (client, data) => {
+      if (this.state.state != ERoomState.Battle) return;
+      if (client.sessionId != this.state.managerSessionId) return;
+      // Store data in-case players are going to re-login, server will send characters data to the client
+      this.gameplayState = data;
+      this.broadcast("updateGameplayState", data);
     });
     this.onMessage("doSelectedAction", (client, data) => {
       if (this.state.state != ERoomState.Battle) return;
