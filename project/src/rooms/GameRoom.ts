@@ -49,6 +49,10 @@ export class GameRoom extends Room<GameRoomState> {
       // Store data in-case players are going to re-login, server will send characters data to the client
       this.gameplayState = data;
       this.broadcast("updateGameplayState", data);
+      // Has a winner, may store winner/loser battle record here
+      if (data.winnerSessionId) {
+        this.state.state = ERoomState.End;
+      }
     });
     this.onMessage("doSelectedAction", (client, data) => {
       if (this.state.state != ERoomState.Battle) return;
