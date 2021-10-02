@@ -100,8 +100,9 @@ export class GameRoom extends Room<GameRoomState> {
     this.broadcast("playerLeave", client.sessionId);
     if (client.sessionId == this.state.managerSessionId) {
       // Change manager to another
+      this.state.managerSessionId = undefined;
       this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
-          this.state.managerSessionId = key
+          this.state.managerSessionId = key;
       });
     }
     console.log(client.sessionId + " left!");
