@@ -97,6 +97,7 @@ export class OnEnterGameCommand extends Command<GameRoomState, {
             if (playersInGame) {
                 this.state.managerSessionId = managerSessionId;
                 this.state.state = ERoomState.Battle;
+                console.log(`State changed to Battle, manager session ID: ${managerSessionId}`);
             }
         }
     }
