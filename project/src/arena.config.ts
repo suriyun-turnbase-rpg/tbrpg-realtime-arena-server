@@ -38,5 +38,13 @@ export default Arena({
         /**
          * Before before gameServer.listen() is called.
          */
-    }
+    },
 });
+
+export function onPlayerWin(userId: string) {
+    
+}
+
+export function onPlayerLose(userId: string) {
+    
+}
