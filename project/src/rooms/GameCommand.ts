@@ -36,6 +36,9 @@ export class OnToggleReadyCommand extends Command<GameRoomState, {
         if (this.state.state >= ERoomState.WaitPlayersToEnterGame) {
             return;
         }
+        if (!this.state.players.has(client.sessionId)) {
+            return;
+        }
         // Change player ready state
         const player = this.state.players.get(client.sessionId);
         if (player.state < EPlayerState.Ready) {
@@ -68,6 +71,9 @@ export class OnEnterGameCommand extends Command<GameRoomState, {
     execute({ client } = this.payload) {
         // Not allow to enter game state if game state < wait players to enter game
         if (this.state.state < ERoomState.WaitPlayersToEnterGame) {
+            return;
+        }
+        if (!this.state.players.has(client.sessionId)) {
             return;
         }
         // Change player in-game state
