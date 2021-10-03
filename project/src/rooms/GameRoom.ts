@@ -75,81 +75,81 @@ export class GameRoom extends Room<GameRoomState> {
     this.setSimulationInterval((deltaTime) => this.update(deltaTime));
   }
 
-  onJoin(client: Client, options: any) {
-    const password = this.password;
-    const dispatcher = this.dispatcher;
-    const playerIds = this.playerIds;
+  async onJoin(client: Client, options: any) {
     const serviceUrl = process.env.SERVICE_URL;
-    const state = this.state;
-    axios.default.post(`${serviceUrl}/validate-login-token?loginToken=${options.loginToken}`, {
+    let responseData: any;
+
+    if (this.password != options.password) {
+      // reject because room's password is wrong
+      console.log(`${client.sessionId} rejected! (wrong password)`);
+      throw new Error("Rejected! (wrong password)");
+    }
+
+    // User validating
+    await axios.default.post(`${serviceUrl}/validate-login-token?loginToken=${options.loginToken}`, {
       refreshToken: false,
     }, {
       headers: { 'Authorization': `Bearer ${options.loginToken}` }
-    })
-      .then(function (response: any) {
-        if (password != options.password) {
-          // reject because password is wrong
-          console.log(`${client.sessionId} rejected! (wrong password)`);
-          throw new Error("Rejected! (wrong password)");
-        }
-        if (response.data.error) {
-          // reject because error occuring
-          console.log(`${client.sessionId} rejected! (${response.data.error})`);
-          throw new Error(`Rejected! (${response.data.error})`);
-        }
+    }).then(function (response: any) {
+      responseData = response.data;
+    }).catch(function (error: string) {
+      // handle error
+      console.log(`Cannot validate login token: ${error}`);
+      throw new Error(`Rejected! (${error})`);
+    });
 
-        const userId: string = String(response.data.player.id);
-        let foundUser: boolean = false;
-        // Find that the user is already playing the game or not?
-        state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
-          if (value.id === userId) {
-            foundUser = true;
-          }
-        });
-        if (foundUser) {
-          // reject because this user is already playing the game
-          console.log(`${client.sessionId} rejected! (user not allowed)`);
-          throw new Error("Rejected! (user not allowed)");
-        }
-        // Find that the user is determined as a player or not?
-        foundUser = false;
-        for (let i = 0; i < playerIds.length; ++i) {
-          if (playerIds[i] === userId) {
-            foundUser = true;
-            break;
-          }
-        }
+    if (responseData.error) {
+      // reject because error occuring
+      console.log(`${client.sessionId} rejected! (${responseData.error})`);
+      throw new Error(`Rejected! (${responseData.error})`);
+    }
 
-        if (state.state < ERoomState.WaitPlayersToEnterGame) {
-          // Store user's ID, to determine that this user will be a player
-          if (!foundUser) {
-            playerIds.push(userId);
-          } else {
-            // reject because this user is not allowed
-            console.log(`${client.sessionId} rejected! (user not allowed)`);
-            throw new Error("Rejected! (user not allowed)");
-          }
-        } else {
-          // This user is not a player, reject!
-          if (!foundUser) {
-            // reject because this user is not allowed
-            console.log(`${client.sessionId} rejected! (user not allowed)`);
-            throw new Error("Rejected! (user not allowed)");
-          }
-        }
+    const userId: string = String(responseData.player.id);
+    let foundUser: boolean = false;
+    // Find that the user is already playing the game or not?
+    this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
+      if (value.id === userId) {
+        foundUser = true;
+      }
+    });
+    if (foundUser) {
+      // reject because this user is already playing the game
+      console.log(`${client.sessionId} rejected! (user not allowed)`);
+      throw new Error("Rejected! (user not allowed)");
+    }
+    // Find that the user is determined as a player or not?
+    foundUser = false;
+    for (let i = 0; i < this.playerIds.length; ++i) {
+      if (this.playerIds[i] === userId) {
+        foundUser = true;
+        break;
+      }
+    }
 
-        // Store player to the room state
-        dispatcher.dispatch(new Commands.OnJoinCommand(), {
-          sessionId: client.sessionId,
-          player: response.data.player,
-        });
-        console.log(`${client.sessionId} joined!`);
-      })
-      .catch(function (error: string) {
-        // handle error
-        console.log(`Cannot validate login token: ${error}`);
-        throw new Error(`Rejected! (${error})`);
-      });
+    if (this.state.state < ERoomState.WaitPlayersToEnterGame) {
+      // Store user's ID, to determine that this user will be a player
+      if (!foundUser) {
+        this.playerIds.push(userId);
+      } else {
+        // reject because this user is not allowed
+        console.log(`${client.sessionId} rejected! (user not allowed)`);
+        throw new Error("Rejected! (user not allowed)");
+      }
+    } else {
+      // This user is not a player, reject!
+      if (!foundUser) {
+        // reject because this user is not allowed
+        console.log(`${client.sessionId} rejected! (user not allowed)`);
+        throw new Error("Rejected! (user not allowed)");
+      }
+    }
+
+    // Store player to the room state
+    this.dispatcher.dispatch(new Commands.OnJoinCommand(), {
+      sessionId: client.sessionId,
+      player: responseData.player,
+    });
+    console.log(`${client.sessionId} joined!`);
   }
 
   onLeave(client: Client, consented: boolean) {
