@@ -154,6 +154,7 @@ export class GameRoom extends Room<GameRoomState> {
           break;
         }
       }
+      this.state.state = ERoomState.WaitPlayersToReady;
     }
     this.state.players.delete(client.sessionId);
     this.broadcast("playerLeave", client.sessionId);
