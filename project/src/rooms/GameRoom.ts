@@ -191,7 +191,7 @@ export class GameRoom extends Room<GameRoomState> {
     switch (state) {
       case ERoomState.CountDownToStartGame:
         // Five seconds to start game
-        this.currentRoomCountDown = 5000;
+        this.currentRoomCountDown = Number(process.env.DURATION_TO_START_GAME);
         break;
     }
   }
