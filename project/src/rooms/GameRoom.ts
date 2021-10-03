@@ -76,9 +76,6 @@ export class GameRoom extends Room<GameRoomState> {
   }
 
   async onJoin(client: Client, options: any) {
-    const serviceUrl = process.env.SERVICE_URL;
-    let responseData: any;
-
     if (this.password != options.password) {
       // reject because room's password is wrong
       console.log(`${client.sessionId} rejected! (wrong password)`);
@@ -86,6 +83,8 @@ export class GameRoom extends Room<GameRoomState> {
     }
 
     // User validating
+    let responseData: any;
+    const serviceUrl = process.env.SERVICE_URL;
     await axios.default.post(`${serviceUrl}/validate-login-token?loginToken=${options.loginToken}`, {
       refreshToken: false,
     }, {
@@ -106,18 +105,18 @@ export class GameRoom extends Room<GameRoomState> {
 
     const userId: string = String(responseData.player.id);
     let foundUser: boolean = false;
-    // Find that the user is already playing the game or not?
+    // Find that the player is already in the room or not?
     this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
       if (value.id === userId) {
         foundUser = true;
       }
     });
     if (foundUser) {
-      // reject because this user is already playing the game
-      console.log(`${client.sessionId} rejected! (user not allowed)`);
-      throw new Error("Rejected! (user not allowed)");
+      console.log(`${client.sessionId} rejected! (player is already in the room)`);
+      throw new Error("Rejected! (player is already in the room)");
     }
-    // Find that the user is determined as a player or not?
+
+    // Find that the player is allowed to battle or not?
     foundUser = false;
     for (let i = 0; i < this.playerIds.length; ++i) {
       if (this.playerIds[i] === userId) {
@@ -127,20 +126,14 @@ export class GameRoom extends Room<GameRoomState> {
     }
 
     if (this.state.state < ERoomState.WaitPlayersToEnterGame) {
-      // Store user's ID, to determine that this user will be a player
+      // Store user's ID, to determine that this player is allowed to battle
       if (!foundUser) {
         this.playerIds.push(userId);
-      } else {
-        // reject because this user is not allowed
-        console.log(`${client.sessionId} rejected! (user not allowed)`);
-        throw new Error("Rejected! (user not allowed)");
       }
     } else {
-      // This user is not a player, reject!
       if (!foundUser) {
-        // reject because this user is not allowed
-        console.log(`${client.sessionId} rejected! (user not allowed)`);
-        throw new Error("Rejected! (user not allowed)");
+        console.log(`${client.sessionId} rejected! (player is not allowed to battle)`);
+        throw new Error("Rejected! (player is not allowed to battle)");
       }
     }
 
