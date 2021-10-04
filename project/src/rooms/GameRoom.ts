@@ -13,8 +13,10 @@ export class GameRoom extends Room<GameRoomState> {
   currentRoomState: number = ERoomState.WaitPlayersToReady;
   currentRoomCountDown: number = 0;
   playerIds: Array<string> = [];
+  playerTeams: Array<number> = [];
   gameplayState: any;
   waitForPlayerAction: boolean = false;
+  teamSortDesc: boolean = false;
 
   onCreate(options: any) {
     // It's 1 vs 1 battle game, so it can have only 2 clients
@@ -141,6 +143,7 @@ export class GameRoom extends Room<GameRoomState> {
     this.dispatcher.dispatch(new Commands.OnJoinCommand(), {
       sessionId: client.sessionId,
       player: responseData.player,
+      teamSortDesc: this.teamSortDesc,
     });
     console.log(`${client.sessionId} joined!`);
   }

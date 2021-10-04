@@ -3,6 +3,9 @@ import { EPlayerState } from "../enums/EPlayerState";
 
 export class GamePlayer extends Schema {
   @type("string")
+  sessionId: string = "";
+
+  @type("string")
   id: string = "";
 
   @type("string")

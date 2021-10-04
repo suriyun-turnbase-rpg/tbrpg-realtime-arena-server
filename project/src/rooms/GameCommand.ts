@@ -8,9 +8,11 @@ import { GameRoomState } from "./schema/GameRoomState";
 export class OnJoinCommand extends Command<GameRoomState, {
     sessionId: string,
     player: any,
+    teamSortDesc: boolean,
 }> {
-    execute({ sessionId, player } = this.payload) {
+    execute({ sessionId, player, teamSortDesc } = this.payload) {
         const newPlayer = new GamePlayer().assign({
+            sessionId: sessionId,
             id: String(player.id),
             profileName: player.profileName,
             exp: player.exp,
@@ -19,12 +21,26 @@ export class OnJoinCommand extends Command<GameRoomState, {
         });
         // Set new player data
         this.state.players.set(sessionId, newPlayer);
-        let team: number = 0;
+
+        // Sorting players
+        const players: Array<GamePlayer> = [];
         this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
             // Simple assign player's team, 0 = A, 1 = B
-            value.team = team++;
-            this.state.players.set(key, value);
+            players.push(value);
         });
+        // Set team by sorting userId
+        players.sort((a, b) => {
+            if(a.id < b.id) { return teamSortDesc ? 1 : -1; }
+            if(a.id > b.id) { return teamSortDesc ? -1 : 1; }
+            return 0;
+        });
+        // Set team
+        let team: number = 0;
+        for (let i = 0; i < players.length; ++i) {
+            const player = players[i];
+            player.team = team++;
+            this.state.players.set(player.id, player);
+        }
     }
 }
 
