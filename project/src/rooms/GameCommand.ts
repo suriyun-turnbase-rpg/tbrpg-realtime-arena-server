@@ -39,7 +39,7 @@ export class OnJoinCommand extends Command<GameRoomState, {
         for (let i = 0; i < players.length; ++i) {
             const player = players[i];
             player.team = team++;
-            this.state.players.set(player.id, player);
+            this.state.players.set(player.sessionId, player);
         }
     }
 }
@@ -64,7 +64,7 @@ export class OnToggleReadyCommand extends Command<GameRoomState, {
         }
         this.state.players.set(client.sessionId, player);
         // Check if all players ready all not
-        if (this.state.players.size >= 2) {
+        if (this.state.players.size >= this.room.maxClients) {
             let playersReady = true;
             this.state.players.forEach((value: GamePlayer, key: string, map: Map<string, GamePlayer>) => {
                 if (value.state < EPlayerState.Ready) {
@@ -99,7 +99,7 @@ export class OnEnterGameCommand extends Command<GameRoomState, {
         }
         this.state.players.set(client.sessionId, player);
         // Check if all players are in game
-        if (this.state.players.size >= 2 && !this.state.managerSessionId) {
+        if (this.state.players.size >= this.room.maxClients && !this.state.managerSessionId) {
             // Session manager can be switched later.
             let managerSessionId = client.sessionId;
             let playersInGame = true;
